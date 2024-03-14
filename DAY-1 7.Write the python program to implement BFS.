@@ -1,51 +1,20 @@
-from collections import deque
-
-class State:
-    def __init__(self, x, y, steps=0):
-        self.x = x
-        self.y = y
-        self.steps = steps
-
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
-
-    def __hash__(self):
-        return hash((self.x, self.y))
-
-def bfs(grid, start):
-    rows, cols = len(grid), len(grid[0])
+from collections import defaultdict
+def bfs(graph, start):
     visited = set()
-    queue = deque([start])
-    directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-    dirty_cells = set()
-
-    for i in range(rows):
-        for j in range(cols):
-            if grid[i][j] == 'D':
-                dirty_cells.add((i, j))
-
+    queue = [start]
+    visited.add(start)
     while queue:
-        current = queue.popleft()
-        if (current.x, current.y) in dirty_cells:
-            dirty_cells.remove((current.x, current.y))
-            print(f"Cleaned cell ({current.x}, {current.y}) in {current.steps} steps")
-
-        for dx, dy in directions:
-            new_x, new_y = current.x + dx, current.y + dy
-            if 0 <= new_x < rows and 0 <= new_y < cols and grid[new_x][new_y] != 'W' and State(new_x, new_y) not in visited:
-                visited.add(State(new_x, new_y))
-                queue.append(State(new_x, new_y, current.steps + 1))
-
-    if not dirty_cells:
-        print("All dirty cells cleaned.")
-
-grid = [
-    ['C', 'D', 'C', 'C', 'C'],
-    ['C', 'C', 'C', 'W', 'C'],
-    ['C', 'D', 'C', 'C', 'C'],
-    ['C', 'C', 'C', 'C', 'C']
-]
-
-start = State(0, 0)
-
-bfs(grid, start)
+        node = queue.pop(0)
+        print(node, end=" ")
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                queue.append(neighbor)
+                visited.add(neighbor)
+if __name__ == "__main__":
+    graph = defaultdict(list)
+    graph[0] = [1, 2, 3]
+    graph[1] = [2, 3]
+    graph[2] = [1, 3]
+    graph[3] = [3]
+    print("BFS traversal:")
+    bfs(graph, 2)
